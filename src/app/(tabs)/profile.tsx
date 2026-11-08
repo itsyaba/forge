@@ -19,10 +19,30 @@ const GOALS: { id: Goal; label: string; hint: string }[] = [
   { id: 'fatloss', label: 'Lose fat', hint: 'Faster pace, shorter rests' },
   { id: 'general', label: 'General fitness', hint: 'Feel good, move better' },
 ];
-const EXPERIENCE: { id: Experience; label: string; hint: string; short: string }[] = [
-  { id: 'never', label: 'Never', hint: 'Totally new. We’ll keep it simple.', short: 'New to this' },
-  { id: 'some', label: 'A little', hint: 'Tried it, never stuck with it.', short: 'Some experience' },
-  { id: 'regular', label: 'Regularly', hint: 'I know my way around.', short: 'Trains regularly' },
+const EXPERIENCE: {
+  id: Experience;
+  label: string;
+  hint: string;
+  short: string;
+}[] = [
+  {
+    id: 'never',
+    label: 'Never',
+    hint: 'Totally new. We’ll keep it simple.',
+    short: 'New to this',
+  },
+  {
+    id: 'some',
+    label: 'A little',
+    hint: 'Tried it, never stuck with it.',
+    short: 'Some experience',
+  },
+  {
+    id: 'regular',
+    label: 'Regularly',
+    hint: 'I know my way around.',
+    short: 'Trains regularly',
+  },
 ];
 const GENDERS: { id: Gender; label: string }[] = [
   { id: 'male', label: 'Male' },
@@ -59,7 +79,9 @@ export default function ProfileTab() {
     if (days.length) update({ days });
   };
   const toggleEquip = (e: HomeEquipment) =>
-    update({ equipment: p.equipment.includes(e) ? p.equipment.filter((x) => x !== e) : [...p.equipment, e] });
+    update({
+      equipment: p.equipment.includes(e) ? p.equipment.filter((x) => x !== e) : [...p.equipment, e],
+    });
 
   const reset = () =>
     Alert.alert('Reset everything?', 'This deletes your profile and all workout history. It cannot be undone.', [
@@ -77,20 +99,38 @@ export default function ProfileTab() {
 
   const goal = GOALS.find((g) => g.id === p.goal)!;
   const exp = EXPERIENCE.find((e) => e.id === p.experience)!;
-  const daysText = p.days.length === 7 ? 'Every day' : p.days.map((d) => WEEKDAY_NAMES[d]).join(', ');
-  const equipText = p.equipment.length ? EQUIPMENT.filter((e) => p.equipment.includes(e.id)).map((e) => e.label).join(', ') : 'None yet';
+  const daysText = p.days.length === 7 ? 'Every day' : p.days.map((d) => WEEKDAY_NAMES[d].slice(0, 2)).join(' ');
+  const equipText = p.equipment.length
+    ? EQUIPMENT.filter((e) => p.equipment.includes(e.id))
+        .map((e) => e.label)
+        .join(', ')
+    : 'None yet';
   const record =
     workouts.length === 0
-      ? 'No workouts yet. Your first one is waiting on the Train tab.'
+      ? 'No workouts yet. Start your first one'
       : `${workouts.length} workout${workouts.length === 1 ? '' : 's'} logged${streak.current ? ` · ${streak.current}-week streak` : ''}`;
 
   return (
     <Screen>
       {/* ── Athlete card */}
-      <View style={{ backgroundColor: colors.accent, borderRadius: radius.lg, padding: space.xl, gap: space.lg }}>
+      <View
+        style={{
+          backgroundColor: colors.accent,
+          borderRadius: radius.lg,
+          padding: space.xl,
+          gap: space.lg,
+        }}
+      >
         <Row gap={space.lg}>
           <View
-            style={{ width: 68, height: 68, borderRadius: radius.md, backgroundColor: colors.onAccent, alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              width: 68,
+              height: 68,
+              borderRadius: radius.md,
+              backgroundColor: colors.onAccent,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
             <Display size={40} color={colors.accent} style={{ lineHeight: 46 }}>
               {p.name.trim().charAt(0) || 'F'}
@@ -136,18 +176,45 @@ export default function ProfileTab() {
                 Your split · {split.days.length} days · see the plan
               </Body>
             </View>
-            <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.onAccent, alignItems: 'center', justifyContent: 'center' }}>
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: colors.onAccent,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Ionicons name="arrow-forward" size={20} color={colors.accent} />
             </View>
           </Pressable>
         ) : null}
 
-        <Row style={{ borderTopWidth: 1, borderTopColor: 'rgba(11,11,11,0.15)', paddingTop: space.lg }}>
+        <Pressable
+          disabled={workouts.length > 0}
+          accessibilityRole={workouts.length ? undefined : 'button'}
+          onPress={() => {
+            tap();
+            router.navigate('/');
+          }}
+          style={({ pressed }) => ({
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: space.sm,
+            minHeight: 48,
+            borderTopWidth: 1,
+            borderTopColor: 'rgba(11,11,11,0.15)',
+            paddingTop: space.lg,
+            opacity: pressed ? 0.6 : 1,
+          })}
+        >
           <Ionicons name="flame" size={18} color={colors.onAccent} />
           <Body weight="semi" color={colors.onAccent} style={{ flex: 1 }}>
             {record}
           </Body>
-        </Row>
+          {workouts.length === 0 ? <Ionicons name="arrow-forward" size={20} color={colors.onAccent} /> : null}
+        </Pressable>
       </View>
 
       {/* ── Settings */}
@@ -167,11 +234,7 @@ export default function ProfileTab() {
       </Group>
 
       <Group title="Data">
-        <Pressable
-          accessibilityRole="button"
-          onPress={reset}
-          style={({ pressed }) => [rowStyle, { opacity: pressed ? 0.6 : 1 }]}
-        >
+        <Pressable accessibilityRole="button" onPress={reset} style={({ pressed }) => [rowStyle, { opacity: pressed ? 0.6 : 1 }]}>
           <Ionicons name="trash-outline" size={20} color={colors.danger} />
           <Body weight="semi" color={colors.danger} style={{ flex: 1 }}>
             Reset all data
@@ -237,7 +300,12 @@ export default function ProfileTab() {
 
       <Sheet visible={editing === 'location'} onClose={close} title="Where you train" hint="We only suggest exercises you can actually do there.">
         <View style={{ gap: space.sm }}>
-          <Option label="At the gym" hint="Machines, cables, barbells and dumbbells" selected={p.location === 'gym'} onPress={() => choose({ location: 'gym' })} />
+          <Option
+            label="At the gym"
+            hint="Machines, cables, barbells and dumbbells"
+            selected={p.location === 'gym'}
+            onPress={() => choose({ location: 'gym' })}
+          />
           <Option label="At home" hint="Bodyweight and whatever gear you have" selected={p.location === 'home'} onPress={() => choose({ location: 'home' })} />
         </View>
       </Sheet>
@@ -367,7 +435,13 @@ function TextSheet({
   }
   return (
     <Sheet visible={visible} onClose={onClose} title={title} hint={hint}>
-      <Row style={{ backgroundColor: colors.surfaceHigh, borderRadius: radius.md, paddingHorizontal: space.lg }}>
+      <Row
+        style={{
+          backgroundColor: colors.surfaceHigh,
+          borderRadius: radius.md,
+          paddingHorizontal: space.lg,
+        }}
+      >
         <TextInput
           value={text}
           onChangeText={setText}
@@ -377,9 +451,23 @@ function TextSheet({
           autoCapitalize="words"
           onSubmitEditing={() => onSave(text)}
           accessibilityLabel={title}
-          style={{ flex: 1, minWidth: 0, fontFamily: fonts.display, fontSize: 32, color: colors.text, paddingVertical: space.md }}
+          cursorColor={colors.accent}
+          selectionColor={colors.accent}
+          selectionHandleColor={colors.accent}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontFamily: fonts.display,
+            fontSize: 32,
+            color: colors.text,
+            paddingVertical: space.md,
+          }}
         />
-        {suffix ? <Display size={22} color={colors.muted}>{suffix}</Display> : null}
+        {suffix ? (
+          <Display size={22} color={colors.muted}>
+            {suffix}
+          </Display>
+        ) : null}
       </Row>
       <Button title="Save" onPress={() => onSave(text)} disabled={!text.trim()} />
     </Sheet>
