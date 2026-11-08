@@ -2,6 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useProfile } from '@/store/profile';
 import { colors, fonts } from '@/theme';
 
@@ -16,6 +17,8 @@ function icon(name: IconName, active: IconName) {
 export default function TabLayout() {
   // tab screens assume a profile; render nothing during a reset until the router moves to onboarding
   const hasProfile = useProfile((s) => !!s.profile);
+  // the bar sits above the system gesture/nav bar, so its height includes the bottom inset
+  const { bottom } = useSafeAreaInsets();
   if (!hasProfile) return null;
   return (
     <Tabs
@@ -23,7 +26,7 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.faint,
-        tabBarStyle: { backgroundColor: colors.bg, borderTopColor: colors.border, height: 64, paddingTop: 6 },
+        tabBarStyle: { backgroundColor: colors.bg, borderTopColor: colors.border, height: 64 + bottom, paddingTop: 6, paddingBottom: bottom + 6 },
         tabBarLabelStyle: { fontFamily: fonts.display, fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase' },
         sceneStyle: { backgroundColor: colors.bg },
       }}
