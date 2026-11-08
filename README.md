@@ -13,6 +13,10 @@ npm install
 npx expo start      # scan the QR code with Expo Go (SDK 58)
 ```
 
+## Install the APK
+
+Every push to `main` builds an Android APK and publishes it as a [GitHub Release](https://github.com/itsyaba/forge/releases) (`v1.0.<build>`), with the commits since the last release as notes. Download the `.apk` on your phone and open it; Android will ask you to allow installs from your browser. The APK is signed with a debug key, so it is for sideloading, not the Play Store. The workflow is `.github/workflows/release.yml`.
+
 ## Scripts
 
 | Command | What it does |
