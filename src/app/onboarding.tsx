@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, TextInput, View } from 'react-native';
 import { Body, Button, Card, Chip, Display, IconButton, Label, Option, ProgressBars, Row, Screen, success } from '@/components/ui';
 import { WEEKDAY_NAMES } from '@/lib/dates';
 import { suggestSplits } from '@/lib/splits';
@@ -87,7 +87,7 @@ export default function Onboarding() {
     set({ equipment: a.equipment.includes(e) ? a.equipment.filter((x) => x !== e) : [...a.equipment, e] });
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <Screen
         edges={['top', 'bottom']}
         footer={<Button title={step === 'ready' ? "Let's go" : 'Next'} onPress={next} disabled={!canNext[step]} />}

@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Pressable, View } from 'react-native';
 import { ExerciseThumb, prefetchExerciseImages } from '@/components/ExerciseDemo';
 import { NumberField } from '@/components/NumberField';
 import { Body, Button, Card, Display, Empty, IconButton, Label, Row, Screen, Stepper, thud } from '@/components/ui';
@@ -51,7 +51,7 @@ export default function Plan() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={100}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={100}>
       <Screen
         edges={['bottom']}
         footer={<Button title="Start workout" icon="play" onPress={start} disabled={!draft.exercises.length || !totalSets} />}
