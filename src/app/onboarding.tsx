@@ -106,6 +106,9 @@ export default function Onboarding() {
             </Display>
             <Body color={colors.muted}>We’ll build your workouts for you. First, what should we call you?</Body>
             <TextInput
+              cursorColor={colors.accent}
+              selectionColor={colors.accent}
+              selectionHandleColor={colors.accent}
               autoFocus
               value={a.name}
               onChangeText={(name) => set({ name })}
@@ -138,6 +141,9 @@ export default function Onboarding() {
             </Row>
             <Row>
               <TextInput
+                cursorColor={colors.accent}
+                selectionColor={colors.accent}
+                selectionHandleColor={colors.accent}
                 autoFocus
                 value={a.bodyWeight}
                 onChangeText={(bodyWeight) => set({ bodyWeight: bodyWeight.replace(/[^0-9.,]/g, '') })}

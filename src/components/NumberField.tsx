@@ -34,6 +34,9 @@ export function NumberField({
   return (
     <View style={{ alignItems: 'center', gap: 2 }}>
       <TextInput
+        cursorColor={colors.accent}
+        selectionColor={colors.accent}
+        selectionHandleColor={colors.accent}
         value={text}
         onChangeText={setText}
         onBlur={commit}
