@@ -5,7 +5,7 @@ import { Body, Button, Card, Display, Label, Row, Screen, Stat } from '@/compone
 import { WorkoutSets } from '@/components/WorkoutSets';
 import { EXERCISE_BY_ID } from '@/data/catalog';
 import { formatDuration } from '@/lib/dates';
-import { estimateCalories, personalRecords, setCount, weeklyStreak, workoutVolume } from '@/lib/stats';
+import { daysLeftThisWeek, estimateCalories, personalRecords, setCount, weeklyStreak, workoutVolume } from '@/lib/stats';
 import { useHistory } from '@/store/history';
 import { useProfile } from '@/store/profile';
 import { colors, space } from '@/theme';
@@ -60,7 +60,9 @@ export default function Summary() {
         </Body>
       ) : (
         <Body color={colors.muted}>
-          {target - streak.thisWeek} more workout{target - streak.thisWeek === 1 ? '' : 's'} this week to keep your streak going.
+          {target - streak.thisWeek <= daysLeftThisWeek()
+            ? `${target - streak.thisWeek} more workout${target - streak.thisWeek === 1 ? '' : 's'} this week to keep your streak going.`
+            : `That one counts. New week Monday: hit ${target} to build your streak.`}
         </Body>
       )}
 

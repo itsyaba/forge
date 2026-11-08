@@ -108,3 +108,8 @@ export function workoutOnDay<W extends Pick<Workout, 'startedAt'>>(workouts: W[]
   const key = dayKey(now);
   return workouts.find((w) => dayKey(w.startedAt) === key);
 }
+
+/** Days left in this Monday-start week after today (Sunday → 0). */
+export function daysLeftThisWeek(now: Date = new Date()): number {
+  return 6 - ((now.getDay() + 6) % 7);
+}
