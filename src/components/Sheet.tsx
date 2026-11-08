@@ -52,7 +52,6 @@ export function Sheet({
             { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [80, 0] }) }] },
           ]}
         >
-          <View style={styles.handle} />
           <View style={{ gap: 4 }}>
             <Display size={30}>{title}</Display>
             {hint ? (
@@ -76,9 +75,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: radius.lg + 8,
     borderTopRightRadius: radius.lg + 8,
     paddingHorizontal: space.lg,
-    paddingTop: space.sm,
+    paddingTop: space.xl,
     gap: space.lg,
     maxHeight: '90%',
   },
-  handle: { alignSelf: 'center', width: 36, height: 4, borderRadius: 2, backgroundColor: colors.faint, marginBottom: space.xs },
 });

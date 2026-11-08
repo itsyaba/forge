@@ -328,13 +328,13 @@ function SettingRow({ label, value, onPress }: { label: string; value: string; o
       }}
       style={({ pressed }) => [rowStyle, { opacity: pressed ? 0.6 : 1 }]}
     >
-      <Body weight="semi" size={16}>
+      <Body weight="semi" size={15} color={colors.muted}>
         {label}
       </Body>
-      <Body color={colors.muted} numberOfLines={1} style={{ flex: 1, textAlign: 'right' }}>
+      <Display size={20} numberOfLines={1} style={{ flex: 1, textAlign: 'right' }}>
         {value}
-      </Body>
-      <Ionicons name="chevron-forward" size={18} color={colors.faint} />
+      </Display>
+      <Ionicons name="chevron-forward" size={18} color={colors.muted} />
     </Pressable>
   );
 }
