@@ -372,7 +372,7 @@ Walked through end to end in the web preview, running in the emulator's Chrome:
 - finish and summary
 - History, Progress (heatmap, strength, body weight) and Profile
 
-Not yet run inside Expo Go 58 on a device.
+Also verified natively in Expo Go 58.0.5 on an Android emulator: onboarding, Train, Progress (empty state), Profile and its edit sheets, keyboard handling, and 130% system font size.
 
 ### Known limitations / notes for the next builder
 - **Images need internet the first time.** They load from the jsDelivr CDN (`cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main`), fall back to raw.githubusercontent.com on error, and are then disk-cached by expo-image. The demo shows a spinner while loading and a tap-to-retry state if both hosts fail. The plan screen prefetches every photo in the workout so the active workout screen is instant.
@@ -380,5 +380,6 @@ Not yet run inside Expo Go 58 on a device.
 - **The Glutes list is long (~98 moves).** It includes plyometric drills through the `secondaryCompound` rule. Top picks are pinned first, so this is cosmetic; a future trim is fine.
 - **The rest timer is foreground-only.** No notification fires when the app is backgrounded; the timer catches up on return because it is timestamp-based.
 - **There is no unit conversion.** Switching kg/lb in Profile only relabels; logged numbers are not converted.
+- **Android edge-to-edge:** screens with text inputs use `KeyboardAvoidingView behavior="padding"` on both platforms, and the tab bar height includes the bottom inset. The window no longer resizes for the keyboard or the gesture bar.
 - **Web preview only:** `storage.web.ts` swaps SQLite for localStorage, and `Alert` button dialogs (end-workout X menu, delete, reset) do nothing on react-native-web. Native is the target; web is just for quick visual checks.
 - **The Train tab shows a "Today · Done" card** once a workout has been logged today. It still offers the next split day as a secondary button.
