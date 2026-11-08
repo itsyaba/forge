@@ -20,6 +20,6 @@ RISKS: The hero panel becoming a hero-metric template (keep it a sentence, not a
 
 FIRST VIEWPORT: Progress shows the title, then the lime week panel (a sentence headline, 7 day columns, the streak line), then the start of the all-time tally. Profile shows the lime athlete card (initial, name, facts line, split row, record line), then the first Training rows.
 
-FORM: The owner pinned both structures in the AskUserQuestion round (Progress leads with this week + streak; Profile is an athlete card + settings), so no concept roll was run. seed: none (owner-pinned).
+FORM: The owner pinned both structures in the AskUserQuestion round (Progress leads with this week + streak; Profile is an athlete card + settings). A concept roll was run for the record (dealt indices 4, 3, 1); the owner pin beats the roll, so the pinned structures stand. seed:d7745c351c5ff20b
 
 TRUTH RULE (from review): the week panel never promises a target the remaining days can’t reach, and days before the account existed are neutral, never “missed”.
