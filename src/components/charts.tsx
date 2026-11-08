@@ -63,8 +63,11 @@ export function Heatmap({
   const [width, setWidth] = useState(0);
   const labelW = 18;
   const gap = 4;
-  const cell = width ? Math.min(22, (width - labelW - gap * weeks) / weeks) : 0;
-  const first = addDays(startOfWeek(now), -7 * (weeks - 1));
+  const cell = width ? Math.min(weeks <= 6 ? 28 : 22, (width - labelW - gap * weeks) / weeks) : 0;
+  // a new account starts the grid at its first week and shows the weeks ahead as open slots
+  const latestFirst = addDays(startOfWeek(now), -7 * (weeks - 1));
+  const joinWeek = since ? startOfWeek(new Date(since)) : null;
+  const first = joinWeek && joinWeek > latestFirst ? joinWeek : latestFirst;
   const today = dayKey(now);
   const sinceKey = since ? dayKey(since) : '';
   return (
@@ -98,8 +101,8 @@ export function Heatmap({
                     height={cell}
                     rx={4}
                     fill={days.has(k) ? colors.accent : future ? 'transparent' : colors.surfaceHigh}
-                    stroke={k === today ? colors.accent : 'none'}
-                    strokeWidth={k === today ? 1.5 : 0}
+                    stroke={k === today ? colors.accent : future ? colors.border : 'none'}
+                    strokeWidth={k === today ? 1.5 : future ? 1 : 0}
                   />
                 );
               }),
