@@ -48,20 +48,32 @@ export function LineChart({
 }
 
 /** GitHub-style grid of the last `weeks` weeks; rows are weekdays Mon–Sun. */
-export function Heatmap({ days, weeks = 12, now = new Date() }: { days: Set<string>; weeks?: number; now?: Date }) {
+export function Heatmap({
+  days,
+  weeks = 12,
+  since,
+  now = new Date(),
+}: {
+  days: Set<string>;
+  weeks?: number;
+  /** account start; earlier days render as small dots, not empty squares */
+  since?: number;
+  now?: Date;
+}) {
   const [width, setWidth] = useState(0);
-  const labelW = 14;
+  const labelW = 18;
   const gap = 4;
   const cell = width ? Math.min(22, (width - labelW - gap * weeks) / weeks) : 0;
   const first = addDays(startOfWeek(now), -7 * (weeks - 1));
   const today = dayKey(now);
+  const sinceKey = since ? dayKey(since) : '';
   return (
     <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       {cell > 0 ? (
         <View style={{ flexDirection: 'row' }}>
           <View style={{ width: labelW, gap }}>
             {WEEKDAY_SHORT.map((d, i) => (
-              <Body key={i} size={9} color={colors.faint} style={{ height: cell, lineHeight: cell }}>
+              <Body key={i} size={11} color={colors.muted} style={{ height: cell, lineHeight: cell }}>
                 {i % 2 === 0 ? d : ''}
               </Body>
             ))}
@@ -72,6 +84,11 @@ export function Heatmap({ days, weeks = 12, now = new Date() }: { days: Set<stri
                 const date = addDays(first, w * 7 + d);
                 const k = dayKey(date);
                 const future = date > now && k !== today;
+                if (k < sinceKey && !days.has(k)) {
+                  return (
+                    <Rect key={k} x={w * (cell + gap) + gap + cell / 2 - 1.5} y={d * (cell + gap) + cell / 2 - 1.5} width={3} height={3} rx={1.5} fill={colors.faint} />
+                  );
+                }
                 return (
                   <Rect
                     key={k}

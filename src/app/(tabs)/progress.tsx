@@ -24,20 +24,29 @@ const round1 = (n: number) => Math.round(n * 10) / 10;
 type DayState = 'done' | 'planned' | 'missed' | 'rest';
 
 /** This week's seven days, Monday first. */
-function weekDays(planned: Weekday[], trained: Set<string>, now = new Date()) {
+function weekDays(planned: Weekday[], trained: Set<string>, joinedAt: number, now = new Date()) {
   const start = startOfWeek(now);
   const today = weekdayOf(now);
-  return WEEKDAY_SHORT.map((label, i) => {
+  const joinedKey = dayKey(joinedAt);
+  const days = WEEKDAY_SHORT.map((label, i) => {
+    const key = dayKey(addDays(start, i));
     const isPlanned = planned.includes(i as Weekday);
-    const state: DayState = trained.has(dayKey(addDays(start, i)))
+    // days before the account existed are neutral, never "missed"
+    const beforeJoin = key < joinedKey;
+    const state: DayState = trained.has(key)
       ? 'done'
-      : !isPlanned
+      : !isPlanned || beforeJoin
         ? 'rest'
         : i < today
           ? 'missed'
           : 'planned';
     return { label, state, today: i === today };
   });
+  // days still open for a workout this week (today counts until you train)
+  const open = days.filter((d, i) => i >= today && d.state !== 'done').length;
+  const firstWeek = joinedAt >= start.getTime();
+  const newcomer = now.getTime() - joinedAt < 28 * 86_400_000;
+  return { days, open, firstWeek, newcomer };
 }
 
 export default function Progress() {
@@ -49,7 +58,7 @@ export default function Progress() {
 
   const trained = useMemo(() => workoutDays(workouts), [workouts]);
   const streak = useMemo(() => weeklyStreak(workouts, target), [workouts, target]);
-  const week = useMemo(() => weekDays(profile.days, trained), [profile.days, trained]);
+  const week = useMemo(() => weekDays(profile.days, trained, profile.createdAt), [profile.days, trained, profile.createdAt]);
   const totals = useMemo(
     () => ({
       sets: workouts.reduce((n, w) => n + setCount(w), 0),
@@ -90,18 +99,28 @@ export default function Progress() {
 
   // ── headline for the week: a sentence, not a scoreboard
   const left = target - streak.thisWeek;
+  // never promise something the calendar can't deliver
+  const reachable = left <= week.open;
   const headline =
     streak.thisWeek >= target
       ? ['Week', 'crushed.']
-      : streak.thisWeek === 0
-        ? [`${target} to go`, 'this week.']
-        : [`${streak.thisWeek} down.`, `${left} to go.`];
+      : reachable
+        ? streak.thisWeek === 0
+          ? [`${target} to go`, 'this week.']
+          : [`${streak.thisWeek} down.`, `${left} to go.`]
+        : streak.thisWeek > 0
+          ? week.firstWeek
+            ? ['Day one.', 'Done.']
+            : [`${streak.thisWeek} this week.`, 'Nice work.']
+          : week.firstWeek
+            ? ['Day one', 'starts now.']
+            : ['One workout', 'still counts.'];
   const streakLine =
     streak.current > 0
       ? `${streak.current}-week streak${streak.best > streak.current ? ` · best ${streak.best}` : ''}`
-      : streak.best > 0
-        ? `Hit ${target} this week to start a new streak · best ${streak.best}`
-        : `Hit ${target} this week to start your streak`;
+      : reachable
+        ? `Hit ${target} this week to ${streak.best > 0 ? 'start a new' : 'start your'} streak`
+        : `New week Monday: hit ${target} to start your streak`;
 
   return (
     <Screen>
@@ -123,7 +142,7 @@ export default function Progress() {
         </View>
 
         <View style={{ flexDirection: 'row', gap: 6 }} accessibilityLabel={`${streak.thisWeek} of ${target} workouts done this week`}>
-          {week.map((d, i) => (
+          {week.days.map((d, i) => (
             <View key={i} style={{ flex: 1, alignItems: 'center', gap: 8 }}>
               <View
                 style={{
@@ -141,9 +160,12 @@ export default function Progress() {
                 {d.state === 'done' ? <Ionicons name="checkmark" size={22} color={colors.accent} /> : null}
                 {d.state === 'rest' ? <View style={{ width: 12, height: 3, borderRadius: 2, backgroundColor: 'rgba(11,11,11,0.2)' }} /> : null}
               </View>
-              <Body size={12} weight={d.today ? 'bold' : 'semi'} color={d.today ? colors.onAccent : 'rgba(11,11,11,0.6)'}>
-                {d.today ? 'Today' : d.label}
-              </Body>
+              <View style={{ alignItems: 'center', gap: 3 }} accessibilityLabel={d.today ? 'Today' : undefined}>
+                <Body size={13} weight={d.today ? 'bold' : 'semi'} color={d.today ? colors.onAccent : 'rgba(11,11,11,0.62)'}>
+                  {d.label}
+                </Body>
+                <View style={{ width: 16, height: 3, borderRadius: 2, backgroundColor: d.today ? colors.onAccent : 'transparent' }} />
+              </View>
             </View>
           ))}
         </View>
@@ -244,7 +266,12 @@ export default function Progress() {
 
       {/* ── Consistency */}
       <Section title="Last 12 weeks" aside={trained.size ? plural(trained.size, 'day') + ' trained' : undefined}>
-        <Heatmap days={trained} />
+        <Heatmap days={trained} since={profile.createdAt} />
+        {week.newcomer ? (
+          <Body size={13} color={colors.muted}>
+            Every day you train lights up a square. Dots are days before you joined.
+          </Body>
+        ) : null}
       </Section>
 
       {/* ── Body weight */}
@@ -280,13 +307,13 @@ export default function Progress() {
               fontFamily: fonts.bodySemi,
               fontSize: 16,
               color: colors.text,
-              backgroundColor: colors.surface,
-              borderRadius: radius.pill,
-              paddingHorizontal: 18,
+              borderBottomWidth: 1.5,
+              borderBottomColor: bwText ? colors.accent : colors.faint,
+              paddingHorizontal: 2,
               paddingVertical: 12,
             }}
           />
-          <Button title="Log" small onPress={logWeight} disabled={!bwText.trim()} />
+          <Button title="Log" onPress={logWeight} disabled={!bwText.trim()} style={{ minHeight: 48, paddingHorizontal: space.xl }} />
         </Row>
       </Section>
     </Screen>
